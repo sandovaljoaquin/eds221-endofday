@@ -4,4 +4,90 @@ format: html
 editor: visual
 ---
 
-## 
+## Set-up
+
+```{r}
+library(tidyverse)
+library(here)
+library(janitor)
+```
+
+## Read in the data 
+```{r}
+
+# Reading in data with here() and store as mack_verts in addition to updating variable names to lower snake case using jannitor :: clean_names()
+
+mack_verts <- read_csv(here::here("data", "AS00601.csv")) %>%
+janitor::clean_names()
+
+```
+
+```{r}
+# Practice accessing individual pieces of the data frame 
+
+mc_wt_5 <- mack_verts$weight[5]
+mc_wt_5
+
+mc_length_8_20 <- mack_verts$length1[8:20]
+mc_length_8_20
+
+# Store anything in column SAMPLEDATE as vectore 
+
+mc_dates <- as.vector(mack_verts$sampledate)
+mc_dates
+```
+
+## Make a salamander subset 
+```{r}
+# Creating a subset that only contains observations for Salamanders 
+
+mc_salamanders <- filter(mack_verts, species == "DITE")
+mc_salamanders
+                           
+```
+
+## Make a scatterplot of salamander l x w 
+
+```{r}
+salamander_plot <- ggplot(data = mc_salamanders, 
+                          aes(x = length1, 
+                              y = weight)) +
+  geom_point(colour = "dodgerblue") + 
+  labs(title = "Pacific Giant Salamander Snout-Vent Length",
+    x = "Snout-Vent Length (mm)",
+       y = "Weight (g)")
+
+salamander_plot
+
+#Exporting scatterplot to figs folder 
+
+ggsave(here::here("figs", "salamander_plot.png"), height = 6, width = 5)                              
+```
+
+## Make a cutthroat plot 
+```{r}
+# Creating a subset that only contains observations for Cutthroat trout 
+
+mc_trout <- filter(mack_verts, species == "ONCL")
+mc_trout
+
+# Create a scatterplot of length1 by weight for all trout 
+
+trout_plot <- ggplot(data = mc_trout, 
+                     aes(x = length1, 
+                     y = weight, 
+                     color = reach)) + # COLOR = REACH 
+  geom_point() + 
+  labs(title = "Cutthroat Trout Snout-Vent Length versus Weight", 
+    x = "Snout-Vent Length (mm)",
+        y = "Weight (g)") +
+  facet_wrap(vars(reach)) + 
+  scale_color_manual(values = c("green", "yellow", "red"))
+  
+trout_plot
+
+ggsave(here::here("figs", "trout_plot.png"), height = 6, width = 5)  
+  
+              
+```
+
